@@ -1,11 +1,12 @@
 import pygame
-from Code.Const import WIN_WIDTH, COLOR_BLOOD, MENU_OPTION, COLOR_GOLD,  COLOR_BRIGHT_BLOOD
+from Code.Const import WIN_WIDTH, COLOR_BLOOD, MENU_OPTION, COLOR_GOLD, COLOR_BRIGHT_BLOOD, WINDOW_HEIGHT
 
 
 class Menu :
     def __init__(self, window):
         self.window = window
-        self.surf = pygame.image.load('./assets/MenuBG.png')
+        self.surf = pygame.image.load('./assets/MenuBG.png').convert()
+        self.surf = pygame.transform.scale(self.surf, (WIN_WIDTH + 300, WINDOW_HEIGHT + 200))
         self.rect = self.surf.get_rect(left=0, top=0)
         self.title_font = pygame.font.Font(
             './assets/Fonte/static/Cinzel-Bold.ttf',50 )
@@ -16,7 +17,12 @@ class Menu :
         pygame.mixer_music.play(-1)
         while True:
             #DRAW IMAGES
-            self.window.blit(source=self.surf, dest=self.rect)
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+
+            offset_x = (mouse_x - WIN_WIDTH / 2) * 0.015
+            offset_y = (mouse_y - WINDOW_HEIGHT / 2) * 0.15
+
+            self.window.blit(self.surf, (-150 - offset_x, -100 - offset_y))
             self.menu_text(text_size=100, text="ETERNAL", text_color=COLOR_BLOOD, text_center_pos=(WIN_WIDTH / 2, 70), glow=True)
             self.menu_text(text_size=100, text="BLOOD", text_color=COLOR_BLOOD, text_center_pos=(WIN_WIDTH / 2, 145), glow=True)
 
