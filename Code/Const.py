@@ -10,6 +10,20 @@ MENU_OPTION = ('New Game',
                'Score',
                'Exit')
 
+# E
+ENTITY_SPEED = {
+    'Level1BG' : 0,
+    'Level2BG' : 0,
+    'Level3BG' : 0,
+    'Level4BG' : 0,
+    'Level5BG' : 0,
+    'Level6BG' : 0,
+}
+
+
+
+
+
 # W
 WIN_WIDTH = 1672
 WINDOW_HEIGHT = 941

@@ -1,5 +1,5 @@
 import pygame
-from Code.const import WIN_WIDTH, COLOR_BLOOD, MENU_OPTION, COLOR_GOLD
+from Code.Const import WIN_WIDTH, COLOR_BLOOD, MENU_OPTION, COLOR_GOLD,  COLOR_BRIGHT_BLOOD
 
 
 class Menu :
@@ -11,22 +11,41 @@ class Menu :
             './assets/Fonte/static/Cinzel-Bold.ttf',50 )
 
     def run(self, ):
+        menu_option = 0
         pygame.mixer_music.load('./assets/Menu.mp3')
         pygame.mixer_music.play(-1)
         while True:
+            #DRAW IMAGES
             self.window.blit(source=self.surf, dest=self.rect)
             self.menu_text(text_size=100, text="ETERNAL", text_color=COLOR_BLOOD, text_center_pos=(WIN_WIDTH / 2, 70), glow=True)
             self.menu_text(text_size=100, text="BLOOD", text_color=COLOR_BLOOD, text_center_pos=(WIN_WIDTH / 2, 145), glow=True)
 
             for i in range(len(MENU_OPTION)):
-                self.menu_text(text_size=70, text=MENU_OPTION[i], text_color=COLOR_GOLD, text_center_pos=(WIN_WIDTH / 2, 350 + 80 *i))
+                if i == menu_option:
+                    self.menu_text(text_size=70, text=MENU_OPTION[i], text_color=COLOR_BRIGHT_BLOOD,text_center_pos=(WIN_WIDTH / 2, 350 + 70 * i))
+                else:
+                    self.menu_text(text_size=70, text=MENU_OPTION[i], text_color=COLOR_GOLD, text_center_pos=(WIN_WIDTH / 2, 350 + 70 *i))
             pygame.display.flip()
 
             # Check for all events
             for event in pygame.event.get():
-               if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT:
                     pygame.quit() # Close Window
                     quit() # End Pygame
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_DOWN:  #DOWN KEY
+                        if menu_option < len(MENU_OPTION) - 1:
+                            menu_option += 1
+                        else:
+                            menu_option = 0
+                    if event.key == pygame.K_UP: #UP KEY
+                        if menu_option > 0:
+                            menu_option -= 1
+                        else:
+                            menu_option = len(MENU_OPTION) - 1
+                    if event.key == pygame.K_RETURN: #ENTER
+                        return MENU_OPTION[menu_option]
+
 
     def menu_text(self, text_size: int, text: str,
                   text_color: tuple, text_center_pos: tuple, glow=False):
