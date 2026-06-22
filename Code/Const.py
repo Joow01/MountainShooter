@@ -1,4 +1,5 @@
 # C
+
 COLOR_BLOOD = (170, 20, 40)
 COLOR_GOLD = (212, 175, 55)
 COLOR_LIGHT_GOLD = (255, 215, 0)
@@ -9,7 +10,7 @@ MENU_OPTION = ('New Game',
                'Continue',
                'Score',
                'Exit')
-
+MAP_WIDTH = 2500
 # E
 ENTITY_SPEED = {
     'Level1BG' : 0,
@@ -18,6 +19,7 @@ ENTITY_SPEED = {
     'Level4BG' : 0,
     'Level5BG' : 0,
     'Level6BG' : 0,
+    'Player' : 5,
 }
 
 
@@ -26,4 +28,4 @@ ENTITY_SPEED = {
 
 # W
 WIN_WIDTH = 1672
-WINDOW_HEIGHT = 941
+WIN_HEIGHT = 941

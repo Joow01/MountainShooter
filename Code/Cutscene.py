@@ -1,12 +1,12 @@
 import pygame
-from Code.Const import WIN_WIDTH, WINDOW_HEIGHT, COLOR_GOLD, COLOR_BLOOD
+from Code.Const import WIN_WIDTH, WIN_HEIGHT, COLOR_GOLD, COLOR_BLOOD
 
 
 class Cutscene:
     def __init__(self, window):
         self.window = window
         self.bg = pygame.image.load('./assets/Level0BGComp.png')
-        self.bg = pygame.transform.scale(self.bg, (WIN_WIDTH, WINDOW_HEIGHT))
+        self.bg = pygame.transform.scale(self.bg, (WIN_WIDTH, WIN_HEIGHT))
         self.font = pygame.font.Font('./assets/Fonte/static/Cinzel-Bold.ttf', 34)
 
         self.lines = [
@@ -51,7 +51,7 @@ class Cutscene:
             )
 
             english_rect = english.get_rect(
-                center=(WIN_WIDTH // 2, WINDOW_HEIGHT // 2 - 30)
+                center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 - 30)
             )
 
             self.window.blit(english, english_rect)
@@ -64,7 +64,7 @@ class Cutscene:
             )
 
             portuguese_rect = portuguese.get_rect(
-                center=(WIN_WIDTH // 2, WINDOW_HEIGHT // 2 + 30)
+                center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 + 30)
             )
 
             self.window.blit(portuguese, portuguese_rect)
@@ -77,7 +77,7 @@ class Cutscene:
             )
 
             hint_rect = hint.get_rect(
-                center=(WIN_WIDTH // 2, WINDOW_HEIGHT - 100)
+                center=(WIN_WIDTH // 2, WIN_HEIGHT - 100)
             )
 
             self.window.blit(hint, hint_rect)
