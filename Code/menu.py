@@ -1,7 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 import pygame
-from Code.const import WIN_WINDTH, COLOR_BLOOD
+from Code.const import WIN_WIDTH, COLOR_BLOOD, MENU_OPTION, COLOR_GOLD
 
 
 class Menu :
@@ -17,8 +15,11 @@ class Menu :
         pygame.mixer_music.play(-1)
         while True:
             self.window.blit(source=self.surf, dest=self.rect)
-            self.menu_text(text_size=100, text="Sangue", text_color=COLOR_BLOOD, text_center_pos=(WIN_WINDTH / 2, 70))
-            self.menu_text(text_size=100, text="Eterno", text_color=COLOR_BLOOD, text_center_pos=(WIN_WINDTH / 2, 145))
+            self.menu_text(text_size=100, text="ETERNAL", text_color=COLOR_BLOOD, text_center_pos=(WIN_WIDTH / 2, 70), glow=True)
+            self.menu_text(text_size=100, text="BLOOD", text_color=COLOR_BLOOD, text_center_pos=(WIN_WIDTH / 2, 145), glow=True)
+
+            for i in range(len(MENU_OPTION)):
+                self.menu_text(text_size=70, text=MENU_OPTION[i], text_color=COLOR_GOLD, text_center_pos=(WIN_WIDTH / 2, 350 + 80 *i))
             pygame.display.flip()
 
             # Check for all events
@@ -28,14 +29,25 @@ class Menu :
                     quit() # End Pygame
 
     def menu_text(self, text_size: int, text: str,
-                  text_color: tuple, text_center_pos: tuple):
+                  text_color: tuple, text_center_pos: tuple, glow=False):
 
         text_font = pygame.font.Font(
             "./assets/Fonte/static/Cinzel-Bold.ttf",
             text_size
         )
 
-        # Sombra preta
+        #Glow
+        if glow:
+            glow_surf = text_font.render(text, True, (255, 70, 70))
+            glow_surf.set_alpha(100)
+
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1),(-1, 1), (1, -1)] :
+                glow_rect = glow_surf.get_rect(
+                    center=(text_center_pos[0] + dx,
+                            text_center_pos[1] + dy)
+                )
+                self.window.blit(glow_surf, glow_rect)
+        # Shadow
         shadow_surf = text_font.render(text, True, (0, 0, 0))
         shadow_rect = shadow_surf.get_rect(
             center=(text_center_pos[0] + 3, text_center_pos[1] + 3)
