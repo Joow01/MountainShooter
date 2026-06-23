@@ -5,11 +5,9 @@ COLOR_GOLD = (212, 175, 55)
 COLOR_LIGHT_GOLD = (255, 215, 0)
 COLOR_BRIGHT_BLOOD = (140, 20, 35)
 
-# M
-MENU_OPTION = ('New Game',
-               'Continue',
-               'Score',
-               'Exit')
+
+
+
 MAP_WIDTH = 2500
 # E
 ENTITY_SPEED = {
@@ -22,7 +20,11 @@ ENTITY_SPEED = {
     'Player' : 5,
 }
 
-
+# M
+MENU_OPTION = ('New Game',
+               'Continue',
+               'Score',
+               'Exit')
 
 
 

@@ -1,7 +1,7 @@
 from Code.Background import Background
 from Code.Const import WIN_HEIGHT
 from Code.Player import Player
-
+from Code.Enemy import Enemy
 
 class EntityFactory:
 
@@ -17,5 +17,6 @@ class EntityFactory:
                 return list_bg
             case 'Player':
                 return Player('PlayerIdle1,1', (10, WIN_HEIGHT // 2))
-
+            case 'Enemy':
+                return Enemy('Enemywalk1', (1700, 700))
         return []
