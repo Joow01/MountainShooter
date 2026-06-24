@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import pygame
 
 from Code.Const import ENTITY_SPEED, WIN_HEIGHT, MAP_WIDTH
@@ -7,52 +8,102 @@ from Code.Entity import Entity
 
 
 class Player(Entity):
-    def load_frame(self, path, scale):
+    @staticmethod
+    def load_frame(path, scale):
         image = pygame.image.load(path).convert_alpha()
         return pygame.transform.scale(
             image,
             (image.get_width() * scale, image.get_height() * scale)
         )
+
     def __init__(self, name: str, position: tuple):
         super().__init__(name, position)
-        self.defending = False
-        self.defense_frames = [
-        self.load_frame('./assets/Protect.png', 4)]
+
         self.max_life = 100
         self.life = self.max_life
+
         self.max_stamina = 100
         self.stamina = self.max_stamina
+
+        self.damage = 1
+        self.damage_frame = 3
+        self.hit_done = False
+
         self.attack_cooldown = 800
         self.last_attack = 0
-        self.animation_speed = 0.20
-        self.attack_animation_speed = 0.15
-        self.attack_frames = [
-        self.load_frame('./assets/PlayerAttack1,1.png', 4),
-        self.load_frame('./assets/PlayerAttack1,2.png', 4),
-        self.load_frame('./assets/PlayerAttack1,3.png', 4),
-        self.load_frame('./assets/PlayerAttack1,4.png', 4),]
         self.attacking = False
         self.attack_finished = False
+
+        self.defending = False
+        self.moving = False
         self.facing_right = True
+
+        self.dying = False
+        self.dead = False
+
         self.frame_index = 0
         self.animation_speed = 0.15
-        self.moving = False
+        self.attack_animation_speed = 0.15
+        self.death_animation_speed = 0.05
+
+        self.sword_sound = pygame.mixer.Sound('./Assets/Player_Sword.mp3')
+        self.voice_sound = pygame.mixer.Sound('./Assets/Player_Grunt.wav')
+        self.sword_sound.set_volume(0.5)
+        self.voice_sound.set_volume(0.4)
+
+        self.defense_frames = [
+            self.load_frame('./Assets/Protect.png', 4)
+        ]
+
+        self.death_frames = [
+            self.load_frame('./Assets/Dead1,1.png', 4),
+            self.load_frame('./Assets/Dead1,2.png', 4),
+            self.load_frame('./Assets/Dead1,3.png', 4),
+            self.load_frame('./Assets/Dead1,4.png', 4),
+            self.load_frame('./Assets/Dead1,5.png', 4),
+        ]
+
+        self.attack_frames = [
+            self.load_frame('./Assets/PlayerAttack1,1.png', 4),
+            self.load_frame('./Assets/PlayerAttack1,2.png', 4),
+            self.load_frame('./Assets/PlayerAttack1,3.png', 4),
+            self.load_frame('./Assets/PlayerAttack1,4.png', 4),
+        ]
+
         self.idle_frames = [
             pygame.transform.scale(
-            pygame.image.load('./assets/PlayerIdle1,1.png').convert_alpha(),(180, 280)),
+                pygame.image.load('./Assets/PlayerIdle1,1.png').convert_alpha(),
+                (180, 280)
+            ),
             pygame.transform.scale(
-            pygame.image.load('./assets/PlayerIdle1,2.png').convert_alpha(),(180, 280)),
+                pygame.image.load('./Assets/PlayerIdle1,2.png').convert_alpha(),
+                (180, 280)
+            ),
             pygame.transform.scale(
-            pygame.image.load('./assets/PlayerIdle1,3.png').convert_alpha(),(180,280)),]
+                pygame.image.load('./Assets/PlayerIdle1,3.png').convert_alpha(),
+                (180, 280)
+            ),
+        ]
+
         self.walk_frames = [
             pygame.transform.scale(
-            pygame.image.load('./assets/PlayerWalk1,1.png').convert_alpha(),(180, 280)),
+                pygame.image.load('./Assets/PlayerWalk1,1.png').convert_alpha(),
+                (180, 280)
+            ),
             pygame.transform.scale(
-            pygame.image.load('./assets/PlayerWalk1,2.png').convert_alpha(),(180, 280)),
+                pygame.image.load('./Assets/PlayerWalk1,2.png').convert_alpha(),
+                (180, 280)
+            ),
             pygame.transform.scale(
-            pygame.image.load('./assets/PlayerWalk1,3.png').convert_alpha(),(180, 280)),
+                pygame.image.load('./Assets/PlayerWalk1,3.png').convert_alpha(),
+                (180, 280)
+            ),
             pygame.transform.scale(
-            pygame.image.load('./assets/PlayerWalk1,4.png').convert_alpha(),(180, 280)),]
+                pygame.image.load('./Assets/PlayerWalk1,4.png').convert_alpha(),
+                (180, 280)
+            ),
+        ]
+
         self.frames = self.idle_frames
         self.surf = self.frames[0]
 
@@ -63,12 +114,19 @@ class Player(Entity):
         return pygame.transform.flip(self.surf, True, False)
 
     def animate(self):
-        if self.attacking:
+        if self.dying:
+            self.frame_index += self.death_animation_speed
+        elif self.attacking:
             self.frame_index += self.attack_animation_speed
         else:
             self.frame_index += self.animation_speed
 
         if self.frame_index >= len(self.frames):
+            if self.dying:
+                self.dead = True
+                self.frame_index = len(self.frames) - 1
+                return
+
             self.frame_index = 0
 
             if self.attacking:
@@ -78,51 +136,63 @@ class Player(Entity):
         self.surf = self.frames[int(self.frame_index)]
         self.rect = self.surf.get_rect(center=old_center)
 
+    def die(self):
+        if not self.dying:
+            self.dying = True
+            self.attacking = False
+            self.defending = False
+            self.moving = False
+            self.frames = self.death_frames
+            self.frame_index = 0
+
     def move(self):
+        if self.dying:
+            self.animate()
+            return
+
         pressed_key = pygame.key.get_pressed()
         self.moving = False
 
-        # Defesa
-        if pressed_key[pygame.K_e] and self.stamina > 0 and not self.attacking:
+        current_time = pygame.time.get_ticks()
+
+        if (
+            pressed_key[pygame.K_z]
+            and not self.attacking
+            and not self.defending
+            and current_time - self.last_attack > self.attack_cooldown
+        ):
+            self.attacking = True
+            self.frame_index = 0
+            self.hit_done = False
+            self.last_attack = current_time
+
+            self.sword_sound.play()
+            self.voice_sound.play()
+
+        if pressed_key[pygame.K_LSHIFT] and self.stamina > 0 and not self.attacking:
             self.defending = True
-            self.stamina -= 0.01
+            self.stamina -= 0.05
         else:
             self.defending = False
 
-        if not self.defending:
-
-            if pressed_key[pygame.K_w] and self.rect.top > 290:
+        if not self.defending and not self.attacking:
+            if pressed_key[pygame.K_UP] and self.rect.top > 290:
                 self.rect.y -= ENTITY_SPEED['Player']
                 self.moving = True
 
-            if pressed_key[pygame.K_s] and self.rect.bottom < WIN_HEIGHT + 350:
+            if pressed_key[pygame.K_DOWN] and self.rect.bottom < WIN_HEIGHT + 350:
                 self.rect.y += ENTITY_SPEED['Player']
                 self.moving = True
 
-            if pressed_key[pygame.K_a] and self.rect.left > -300:
+            if pressed_key[pygame.K_LEFT] and self.rect.left > -300:
                 self.rect.x -= ENTITY_SPEED['Player']
                 self.facing_right = False
                 self.moving = True
 
-            if pressed_key[pygame.K_d] and self.rect.right < MAP_WIDTH:
+            if pressed_key[pygame.K_RIGHT] and self.rect.right < MAP_WIDTH:
                 self.rect.x += ENTITY_SPEED['Player']
                 self.facing_right = True
                 self.moving = True
-        current_time = pygame.time.get_ticks()
-        if (
-                pressed_key[pygame.K_SPACE]
-                and not self.attacking
-                and current_time - self.last_attack > self.attack_cooldown
-        ):
-            self.attacking = True
-            self.frame_index = 0
-            self.last_attack = current_time
-
-        if pressed_key[pygame.K_e] and self.stamina > 0 and not self.attacking:
-            self.defending = True
-            self.stamina -= 0.1
-        else:
-            self.defending = False
 
         if self.attacking:
             self.frames = self.attack_frames

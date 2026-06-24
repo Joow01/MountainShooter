@@ -26,6 +26,7 @@ MENU_OPTION = ('New Game',
                'Score',
                'Exit')
 
+# S
 
 
 # W

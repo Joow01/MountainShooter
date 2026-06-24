@@ -1,13 +1,14 @@
 import pygame
+import sys
 from Code.Const import WIN_WIDTH, WIN_HEIGHT, COLOR_GOLD, COLOR_BLOOD
 
 
 class Cutscene:
     def __init__(self, window):
         self.window = window
-        self.bg = pygame.image.load('./assets/Level0BGComp.png')
+        self.bg = pygame.image.load('./Assets/Level0BGComp.png')
         self.bg = pygame.transform.scale(self.bg, (WIN_WIDTH, WIN_HEIGHT))
-        self.font = pygame.font.Font('./assets/Fonte/static/Cinzel-Bold.ttf', 34)
+        self.font = pygame.font.Font('./Assets/Fonte/static/Cinzel-Bold.ttf', 34)
 
         self.lines = [
             (
@@ -88,7 +89,7 @@ class Cutscene:
 
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    quit()
+                    sys.exit()
 
                 if event.type == pygame.KEYDOWN:
 
